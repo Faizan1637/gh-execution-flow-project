@@ -22,7 +22,7 @@ jobs:
   call-reusable-workflow:
     needs: build
 
-    uses: ./.github/workflows/reusable-workflow.yml
+    uses: ./.github/workflows/resuable.yml.yml
 
     with:
       artifact-name: dist
