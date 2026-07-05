@@ -1,0 +1,47 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Name of the artifact to download
+        required: false
+        type: string
+        default: dist
+
+    secrets:
+      secret-abc:
+        description: Secret used for authentication
+        required: true
+
+    outputs:
+      my-output:
+        description: Output from reusable workflow
+        value: ${{ jobs.download-artifact.outputs.my-output }}
+
+jobs:
+  download-artifact:
+    runs-on: ubuntu-latest
+
+    outputs:
+      my-output: ${{ steps.set-output.outputs.my-output }}
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+
+      - name: Use secret
+        run: |
+          echo "Secret length: ${#SECRET}"
+        env:
+          SECRET: ${{ secrets.secret-abc }}
+
+      - name: List downloaded files
+        run: ls -la
+
+      - name: Set output
+        id: set-output
+        run: |
+          echo "my-output=This is my output value" >> $GITHUB_OUTPUT

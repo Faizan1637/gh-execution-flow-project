@@ -1,0 +1,41 @@
+name: Caller Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create sample artifact
+        run: |
+          mkdir dist
+          echo "Hello GitHub Actions" > dist/file.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  call-reusable-workflow:
+    needs: build
+
+    uses: ./.github/workflows/reusable-workflow.yml
+
+    with:
+      artifact-name: dist
+
+    secrets:
+      secret-abc: ${{ secrets.MY_SECRET }}
+
+  print-output:
+    needs: call-reusable-workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print reusable workflow output
+        run: |
+          echo "Output is:"
+          echo "${{ needs.call-reusable-workflow.outputs.my-output }}"
